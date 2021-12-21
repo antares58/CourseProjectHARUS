@@ -1,0 +1,64 @@
+---
+title: "HARUS Codebook"
+author: "Elizabeth Lee"
+date: "12/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Codebook for the HARUS Averages Data Set
+
+"HARUS" is an acronym of "Human Activity Recognition Using Smartphones", which is the name of the source dataset used in this analysis. All credit for the creation of the source data set belongs to:
+
+    Human Activity Recognition Using Smartphones Dataset
+    Version 1.0
+
+    Jorge L. Reyes-Ortiz, Davide Anguita, Alessandro Ghio, Luca Oneto.
+    Smartlab - Non Linear Complex Systems Laboratory
+    DITEN - Universit‡ degli Studi di Genova.
+    Via Opera Pia 11A, I-16145, Genoa, Italy.
+    activityrecognition@smartlab.ws
+    www.smartlab.ws
+
+The full description and original dataset are available at:
+
+https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
+
+The data used in this project were downloaded from:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
+
+on 16 December 2021 at 16:05 America/Los_Angeles time. Processing was performed in RStudio, Version 1.4.1106, with R version 4.1.2, running on MacOS 10.16.0.
+
+The Human Activity Recognition Using Smartphones Dataset, as described by its authors in the dataset's README file, records the results of experiments which captured sensor signals from the embedded accelerometer and gyroscope of smartphones worn by the volunteers while performing specific activities. THe experiment defined six activities, recorded in the file activity_labels.txt; each volunteer performed each of the six activities multiple times, for a total of 10,299 observations.
+
+These raw data were processed by the authors into 561 components of motion, referred to as "features". 
+
+```{r features}
+library(data.table)
+library(tidyr)
+
+tibble(fread("./Data/features.txt"))
+```
+
+These feature measurements are divided in two text files, the training set, X_train.txt, and the test set, X_test.txt; each row of these files represents the observation of one experiment, that is, the features of one activity performed one time by one volunteer.  
+
+Accompanying each of these data files are text files containing the subject identifiers (subject_train.txt, subject_test.txt) and activity identifiers (y_train.txt, y_test.txt) that correspond to the rows of their respective feature data files.
+
+The HARUS Averages data set is derived only from the processed data (X_train.txt and X_test.txt) and accompanying subject and activity identifier files. The dataset consists of
+
+    - a Readme file
+    - this codebook
+    - an R script file, run_analysis.R
+    - a data file, HARUS Averages.csv
+
+run_analysis.R is the script used to process the source data and generate the HARUS Averages.csv file.
+
+HARUS Averages.csv is a comma-separated text file which contains the averages of the mean and standard deviation of time and frequency features of the combined train and test data sets.
+
+```{r tidy-data}
+tibble(read.csv("./HARUS Averages.csv"))
+```
