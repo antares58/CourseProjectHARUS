@@ -8,7 +8,7 @@ http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartpho
 
 A full description of the source data can be found in the README.txt file at the link above.
 
-A brief summary of the data, a description of the processing and analysis performed on the original data, and a description of the resulting data can be found in CodeBook.html. (The code used to generate the codebook can be found in in the RMarkdown file, CodeBook.Rmd.)
+A brief summary of the data, a description of the processing and analysis performed on the original data, and a description of the resulting data can be found in CodeBook.pdf. (The code used to generate the codebook can be found in in the RMarkdown file, CodeBook.Rmd.)
 
 The R code which was used to process the source data and perform the analysis can be found in the R script file, run_analysis.R.
 
