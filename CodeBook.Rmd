@@ -27,11 +27,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The full description and original dataset are available at:
 
-https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
+<link url>https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
 
 The data used in this project were downloaded from:
 
-https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
+<link url>https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
 
 on 16 December 2021 at 16:05 America/Los_Angeles time. Processing was performed in RStudio, Version 1.4.1106, with R version 4.1.2, running on MacOS 10.16.0.
 
@@ -67,7 +67,7 @@ The data consist of four variables:
     - Meaning: unique identifiers of the 30 volunteers who participated in the Human Activity Recognition Using 
             Smartphones experiments
     - Source: subject_test.txt, subject_train.txt
-    - Processing: none
+    - Processing: none\
 
 - **Activity**: *factor* with 6 levels
     - Meaning: unique identifiers of the six activities performed during the experiments
@@ -82,16 +82,16 @@ The data consist of four variables:
             4 SITTING                 4     Sitting
             5 STANDING                5     Standing
             6 LAYING                  6     Lying
-            
+ \
 - **Feature**: *character*, n = 66
     - Meaning: the names of selected features
     - Source: features.txt
-    - Processing: the selected features are the means and standard deviations of time and frequency variables calculated from acceleration and gravity signals by the original authors; see note 2
+    - Processing: the selected features are the means and standard deviations of time and frequency variables calculated from acceleration and gravity signals by the original authors; see note 2\
 
 - **Average**: calculated *double*, range [-1,1]
     - Meaning: each value represents the average of the values selected features, for all repetitions of an activity by one subject
     - Source: X_test.txt, X_train.txt
-    - Processing: see Processing, below
+    - Processing: see Processing, below\
  
  **Note 1**: The source activity labels were reformatted slightly for readability in defining the activity factor. In addition, the label LAYING was changed to the correct English verb for the activity performed, Lying. The mistake of confusing the verbs to lay and to lie is common even among native English speakers, but given that this is a scientific study characterizing motion during specific activities, the distinction is relevant. 
  
@@ -105,12 +105,11 @@ The data consist of four variables:
  The action of lying down which was performed by the volunteers is not at all the same as the action of laying something down. In respect for the scientific rigor of the experiment's authors, the correct terminology should be used. 
  
  **Note 2**: The names assigned to features by the authors of the Human Activity Recognition Using Smartphones experiments are necessarily somewhat cryptic, given the challenge of devising unique descriptive names that are still workably short for 561 measurements. The original feature names were read from the source file and modified slightly by regex substitution for readability by:
-    - removing () and - characters
-    - standardizing the use of case
-    - expanding the initial "t" and "f" that identify time and frequency 
-        variables to "time" and "freq"
-    - removing what appeared to be a corruption in the original data of 
-        several frequency names where the string "Body" was duplicated:
+ 
+- removing () and - characters
+- standardizing the use of case
+- expanding the initial "t" and "f" that identify time and frequency variables to "time" and "freq"
+- removing what appeared to be a corruption in the original data of several frequency names where the string "Body" was duplicated:
         
         ex. fBodyBodyAccJerkMag-mean() -> freqBodyAccJerkMagMean
 
@@ -192,7 +191,7 @@ avg_std$V1
 
 The first column, V1, of the selected features data table contains the original row numbers of the full feature set, which are passed to *fread()* via the *select* argument to read in only the desired columns. The second column, V2, are passed via the *col.names* argument to provide the column headers of the imported data tables for the test and train data.
 
-Before rbinding the test and train data tables, it is necessary to attach the subject and activity identifiers for each row of the respective tables. Examination of the subject_\*.txt and y_\*.txt files demonstrates that each contains a single vector whose length matches the row count of the respective data file. Therefore these files can simply be attached to the lefthand side of the appropriate data table using cbind(). Before cbinding the activity identifiers, the data is converted from integers to a factor defined to match the activity labels in the original dataset (activity_labels.txt), as described above.
+Before rbinding the test and train data tables, it is necessary to attach the subject and activity identifiers for each row of the respective tables. Examination of the subject_\*.txt and y_\*.txt files demonstrates that each contains a single vector whose length matches the row count of the respective data file. Therefore these files can simply be attached to the lefthand side of the appropriate data table using cbind(). Before cbinding the activity identifiers, the data is converted from integers to a factor defined to match the activity labels in the original dataset (activity_labels.txt), as described above.\
 
 ```{r check-test-subject}
 testSubject <- fread("./Data/test/subject_test.txt")
