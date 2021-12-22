@@ -119,6 +119,5 @@ tidyData <- pivot_longer(avgData,
                          names_to = "Feature",
                          values_to = "Average")
 
-# Write the tidy data set to a CSV file.
-write.csv(tidyData, paste0(outputPath, "HARUS Averages.csv"),
-          row.names = FALSE)
+# Write the tidy data set to a text file.
+write.table(tidyData, "HARUS Averages.txt",row.names = FALSE)
