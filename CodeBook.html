@@ -217,7 +217,163 @@ tibble(fread(&quot;./Data/features.txt&quot;))</code></pre>
 - an R script file, run_analysis.R
 - a data file, HARUS Averages.csv</code></pre>
 <p>run_analysis.R is the script used to process the source data and generate the HARUS Averages.csv file.</p>
-<p>HARUS Averages.csv is a comma-separated text file which contains the averages of the mean and standard deviation of time and frequency features of the combined train and test data sets.</p>
+<p>HARUS Averages.csv is a comma-separated text file with headers which contains the averages of the mean and standard deviation of time and frequency features of the combined train and test data sets.</p>
+<p>The data consist of four variables:</p>
+<ul>
+<li><strong>SubjectID</strong>: <em>integer</em>, range 1:30
+<ul>
+<li>Meaning: unique identifiers of the 30 volunteers who participated in the Human Activity Recognition Using Smartphones experiments</li>
+<li>Source: subject_test.txt, subject_train.txt</li>
+<li>Processing: none</li>
+</ul></li>
+<li><strong>Activity</strong>: <em>factor</em> with 6 levels
+<ul>
+<li><p>Meaning: unique identifiers of the six activities performed during the experiments</p></li>
+<li><p>Source: activity_labels.txt; y_test.txt, y_train.txt</p></li>
+<li><p>Processing: the factor variable is based on activity_labels.txt; see note 1; the values of the Activity variable were read from the y_*.txt files unmodified</p>
+<pre><code>  Source                  Factor: activity
+                          Level   Label
+  1 WALKING                 1     Walking
+  2 WALKING_UPSTAIRS        2     WalkingUpstairs
+  3 WALKING_DOWNSTAIRS      3     WalkingDownstairs
+  4 SITTING                 4     Sitting
+  5 STANDING                5     Standing
+  6 LAYING                  6     Lying</code></pre></li>
+</ul></li>
+<li><strong>Feature</strong>: <em>character</em>, n = 66
+<ul>
+<li>Meaning: the names of selected features</li>
+<li>Source: features.txt</li>
+<li>Processing: the selected features are the means and standard deviations of time and frequency variables calculated from acceleration and gravity signals by the original authors; see note 2</li>
+</ul></li>
+<li><strong>Average</strong>: calculated <em>double</em>, range [-1,1]
+<ul>
+<li>Meaning: each value represents the average of the values selected features, for all repetitions of an activity by one subject</li>
+<li>Source: X_test.txt, X_train.txt</li>
+<li>Processing: see Processing, below</li>
+</ul></li>
+</ul>
+<p><strong>Note 1</strong>: The source activity labels were reformatted slightly for readability in defining the activity factor. In addition, the label LAYING was changed to the correct English verb for the activity performed, Lying. The mistake of confusing the verbs to lay and to lie is common even among native English speakers, but given that this is a scientific study characterizing motion during specific activities, the distinction is relevant.</p>
+<pre><code>to lay: to put [something] down, especially gently or carefully
+
+to lie: to be in or assume a horizontal or resting position on a         
+        supporting surfact
+        
+        (source: Macintosh Dictionary app, version 2.3.0)
+        </code></pre>
+<p>The action of lying down which was performed by the volunteers is not at all the same as the action of laying something down. In respect for the scientific rigor of the experiment’s authors, the correct terminology should be used.</p>
+<p><strong>Note 2</strong>: The names assigned to features by the authors of the Human Activity Recognition Using Smartphones experiments are necessarily somewhat cryptic, given the challenge of devising unique descriptive names that are still workably short for 561 measurements. The original feature names were read from the source file and modified slightly by regex substitution for readability by: - removing () and - characters - standardizing the use of case - expanding the initial “t” and “f” that identify time and frequency variables to “time” and “freq” - removing what appeared to be a corruption in the original data of several frequency names where the string “Body” was duplicated:</p>
+<pre><code>    ex. fBodyBodyAccJerkMag-mean() -&gt; freqBodyAccJerkMagMean</code></pre>
+</div>
+<div id="processing" class="section level1">
+<h1>Processing</h1>
+<p>Initial examination of the source dataset showed that the data are clean and straightforward to work with.</p>
+<pre class="r"><code>test &lt;- fread(&quot;./Data/test/X_test.txt&quot;)
+train &lt;- fread(&quot;./Data/train/X_train.txt&quot;)
+dim(test); any(is.na(test))</code></pre>
+<pre><code>## [1] 2947  561</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>dim(train); any(is.na(train))</code></pre>
+<pre><code>## [1] 7352  561</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>The source dataset’s README file states that there are 561 features, and that each row of the X_*.txt files is a feature vector. The dimensions of the data files confirm that each row has 561 columns, as expected, and a check for missing values detects none.</p>
+<pre class="r"><code>features &lt;- fread(&quot;./Data/features.txt&quot;)
+head(features, n = 4L)</code></pre>
+<pre><code>##    V1                V2
+## 1:  1 tBodyAcc-mean()-X
+## 2:  2 tBodyAcc-mean()-Y
+## 3:  3 tBodyAcc-mean()-Z
+## 4:  4  tBodyAcc-std()-X</code></pre>
+<pre class="r"><code>dim(features)</code></pre>
+<pre><code>## [1] 561   2</code></pre>
+<pre class="r"><code>any(is.na(features))</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>As expected, there are 561 features, which identify the values in the columns of the numeric data files; no values are missing.</p>
+<pre class="r"><code>testNames &lt;- names(test)
+trainNames &lt;- names(train)
+head(testNames, n = 4L)</code></pre>
+<pre><code>## [1] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot;</code></pre>
+<pre class="r"><code>head(trainNames, n = 4L)</code></pre>
+<pre><code>## [1] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot;</code></pre>
+<pre class="r"><code>identical(testNames, trainNames)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>A check of the column names of the read-in test and train data files shows that default column names have been generated, and that these are identical between the two files. The two data tables can simply be clipped together using rbind().</p>
+<p>However, these are fairly large data tables and we are only interested in a subset of the features they contain, namely, the means and standard deviations of the following variables, described in this exceprt from the features_info.txt file of the source dataset:</p>
+<blockquote>
+<p>These signals were used to estimate variables of the feature vector for each pattern:</p>
+</blockquote>
+<blockquote>
+<p>&#39;-XYZ&#39; is used to denote 3-axial signals in the X, Y and Z directions.</p>
+</blockquote>
+<blockquote>
+<p>tBodyAcc-XYZ<br />
+tGravityAcc-XYZ<br />
+tBodyAccJerk-XYZ<br />
+tBodyGyro-XYZ<br />
+tBodyGyroJerk-XYZ<br />
+tBodyAccMag<br />
+tGravityAccMag<br />
+tBodyAccJerkMag<br />
+tBodyGyroMag<br />
+tBodyGyroJerkMag<br />
+fBodyAcc-XYZ<br />
+fBodyAccJerk-XYZ<br />
+fBodyGyro-XYZ<br />
+fBodyAccMag<br />
+fBodyAccJerkMag<br />
+fBodyGyroMag<br />
+fBodyGyroJerkMag<br />
+</p>
+</blockquote>
+<p>The following regular expression is used to select the desired features and their corresponding row numbers.</p>
+<pre class="r"><code>tmp &lt;- grep(&quot;mean[^A-Z,a-z]()|std[^A-Z,a-z]()&quot;, features$V2, value = TRUE)
+avg_std &lt;- features[features$V2 %in% tmp, ]
+head(avg_std, n = 4L)</code></pre>
+<pre><code>##    V1                V2
+## 1:  1 tBodyAcc-mean()-X
+## 2:  2 tBodyAcc-mean()-Y
+## 3:  3 tBodyAcc-mean()-Z
+## 4:  4  tBodyAcc-std()-X</code></pre>
+<p>The resulting set of features contains 66 variables.</p>
+<pre class="r"><code>nrow(avg_std)</code></pre>
+<pre><code>## [1] 66</code></pre>
+<pre class="r"><code>avg_std$V1</code></pre>
+<pre><code>##  [1]   1   2   3   4   5   6  41  42  43  44  45  46  81  82  83  84  85  86 121
+## [20] 122 123 124 125 126 161 162 163 164 165 166 201 202 214 215 227 228 240 241
+## [39] 253 254 266 267 268 269 270 271 345 346 347 348 349 350 424 425 426 427 428
+## [58] 429 503 504 516 517 529 530 542 543</code></pre>
+<p>The first column, V1, of the selected features data table contains the original row numbers of the full feature set, which are passed to <em>fread()</em> via the <em>select</em> argument to read in only the desired columns. The second column, V2, are passed via the <em>col.names</em> argument to provide the column headers of the imported data tables for the test and train data.</p>
+<p>Before rbinding the test and train data tables, it is necessary to attach the subject and activity identifiers for each row of the respective tables. Examination of the subject_*.txt and y_*.txt files demonstrates that each contains a single vector whose length matches the row count of the respective data file. Therefore these files can simply be attached to the lefthand side of the appropriate data table using cbind(). Before cbinding the activity identifiers, the data is converted from integers to a factor defined to match the activity labels in the original dataset (activity_labels.txt), as described above.</p>
+<pre class="r"><code>testSubject &lt;- fread(&quot;./Data/test/subject_test.txt&quot;)
+dim(testSubject); any(is.na(testSubject))</code></pre>
+<pre><code>## [1] 2947    1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>testActivity &lt;- fread(&quot;./Data/test/y_test.txt&quot;)
+dim(testActivity); any(is.na(testActivity))</code></pre>
+<pre><code>## [1] 2947    1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>trainSubject &lt;- fread(&quot;./Data/train/subject_train.txt&quot;)
+dim(trainSubject); any(is.na(trainSubject))</code></pre>
+<pre><code>## [1] 7352    1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>trainActivity &lt;- fread(&quot;./Data/train/y_train.txt&quot;)
+dim(trainActivity); any(is.na(trainActivity))</code></pre>
+<pre><code>## [1] 7352    1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>Calculation of the averages for each feature, by activity and subject is a straightforward matter of splitting the combined data table first on subject, then on activity, and calculating the means of all the features in each resulting group.</p>
+<p>The output data table has 68 columns: the 2 identifier columns, SubjectID and Activity, and 66 feature columns. This is messy, because the dataset actually contains only four variables:</p>
+<ul>
+<li>SubjectID (OK)</li>
+<li>Activity (OK)</li>
+<li>Feature, spread across the column names</li>
+<li>Average, spread across the column values</li>
+</ul>
+<p>The pivot_longer() function is used to reshape the data table by storing the features (column names) in a variable named “Feature”, and the values (the averages) in a variable named “Average”. The resulting data table now conforms to Hadley Wickham’s principles for tidy data:</p>
+<ol style="list-style-type: decimal">
+<li>Each variable forms a column</li>
+<li>Each observation forms a row</li>
+<li>Each type of observational unit forms a table</li>
+</ol>
 <pre class="r"><code>tibble(read.csv(&quot;./HARUS Averages.csv&quot;))</code></pre>
 <pre><code>## # A tibble: 11,880 × 4
 ##    SubjectID Activity Feature             Average
