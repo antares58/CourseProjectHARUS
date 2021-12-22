@@ -21,4 +21,3 @@ The results of the analysis can be found in HARUS Averages.csv, which is a comma
 1. Each variable forms a column
 2. Each observation forms a row
 3. Each type of observational unit forms a table
-
